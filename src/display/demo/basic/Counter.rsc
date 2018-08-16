@@ -7,7 +7,8 @@ data Msg = inc()
          
 alias Model = tuple[int count];
 Model model = <0>;
-Widget view = defaultWidget;
+Widget display = defaultWidget;
+Widget mainWindow = defaultWidget;
 
 void updateModel(Msg msg) {
   switch (msg) {
@@ -16,22 +17,24 @@ void updateModel(Msg msg) {
   }
 }
 
-void updateView(Msg msg) {
-  view.innerHTML("<model.count>");
+void view(Msg msg) {
+  if (msg==init()) {
+    mainWindow = createPanel();
+    Widget d = div(mainWindow);
+    Widget h = h2(d).innerHTML("My first counter app in Rascal");  
+    Widget up = button(d).innerHTML("+").eventm(click, inc(), update);  
+    Widget down = button(d).innerHTML("-").eventm(click,dec(), update);
+    display = div(d);
+    } 
+  display.innerHTML("<model.count>");
   }
   
 void update(Widget w, Msg msg) {
    updateModel(msg);
-   updateView(msg);
+   view(msg);
 }
 
 public void main() {
-    Widget z=createPanel();
-    Widget d = div(z);
-    Widget h = h2(d).innerHTML("My first counter app in Rascal");  
-    Widget up = button(d).innerHTML("+").eventm(click, inc(), update);  
-    Widget down = button(d).innerHTML("-").eventm(click,dec(), update);
-    view = div(d).innerHTML("<model.count>");
-    updateView(inc());
-    eventLoop(z, []); 
+    view(init());
+    eventLoop(mainWindow , []); 
     }

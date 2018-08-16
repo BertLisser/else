@@ -8,7 +8,7 @@ public str click  = "click";
 public str change = "change";
 public str tick = "tick";
 
-data Msg = empty();
+data Msg = init();
 
 map[int, lrel[set[tuple[str id , str eventName]], void()]] events = ();
 
