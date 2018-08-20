@@ -1,8 +1,8 @@
 # else an alternative for salix
 A variant of salix which displays figures with help of java fx. In the beginning Rascal behaves as a client, and graphical user interface, 
-which runs Jave Fx, is the server. Entered graphical rascal commands will be directly displayed. In the second phase, in the rascal waitEventLoop, 
+which runs Jave Fx, is the server. Entered graphical rascal commands will be directly displayed. In the second phase, during the rascal `waitEventLoop`, 
 the roles of the processes will be reversed.
-We will use the Msg, Model, View idea of Salix. The view has,opposed to Salix, consits of a stable part and a part which will be updated that 
+We will use the Msg, Model, View idea of Salix. The view has,opposed to Salix, consists of a stable part and a part which will be updated that 
 depends on the Msg argument. 
 
 An advantage of this is, that the implementation can be much simpler, because there is no need to detect the changes in the dom tree on 
