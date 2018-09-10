@@ -10,6 +10,9 @@ public str tick = "tick";
 
 data Msg = init();
 
+int width0 = 800;
+int height0 = 800;
+
 map[int, lrel[set[tuple[str id , str eventName]], void()]] events = ();
 
 /*
@@ -27,6 +30,21 @@ alias Widget = tuple[int process, str id, str eventName, str val
  */
  data Widget
      = widget(int process = -1, str id = "", str eventName="main", str val = "none"
+     ,Widget() div = widgetVoid
+     ,Widget() span = widgetVoid
+     ,Widget() h1 = widgetVoid
+     ,Widget() h2 = widgetVoid
+     ,Widget() h3 = widgetVoid
+     ,Widget() h4 = widgetVoid
+     ,Widget() table = widgetVoid
+     ,Widget() tr = widgetVoid
+     ,Widget() td = widgetVoid
+     ,Widget() button = widgetVoid
+     ,Widget() input = widgetVoid
+     ,Widget() svg = widgetVoid
+     ,Widget() rect = widgetVoid
+     ,Widget() circle = widgetVoid
+     ,Widget() path = widgetVoid
      ,Widget(str) class = widgetStr
      ,Widget(str) style = widgetStr
      ,Widget(str, str) attr = widgetStrStr
@@ -39,8 +57,8 @@ alias Widget = tuple[int process, str id, str eventName, str val
      ,Widget(int) r = widgetInt
      ,Widget(str) innerHTML = widgetStr
      ,Widget(str ,  void(value)) event  = widgetStrFun
-     ,Widget(str , Msg , void(value, Msg)) eventm = widgetEvent1
-     ,Widget(str , Msg(str) , void(value, Msg)) eventf = widgetEvent2
+     ,Widget(str , Msg , void(Msg)) eventm = widgetEvent1
+     ,Widget(str , Msg(str) , void(Msg)) eventf = widgetEvent2
      );
       
  private Widget newWidget(Widget p,  str id) {
@@ -49,6 +67,21 @@ alias Widget = tuple[int process, str id, str eventName, str val
     
 private Widget newWidget(Widget p,  str id, str eventName) {
     Widget _r =  widget(process=p.process, id=id, eventName=eventName);
+     _r.div = Widget() {return xml(_r, "div");};
+    _r.span = Widget() {return xml(-r, "span");};
+    _r.h1 = Widget() {return xml(_r, "h1");};
+    _r.h2 = Widget() {return xml(_r, "h2");};
+    _r.h3 = Widget() {return xml(-r, "h3");};
+    _r.h4 = Widget() {return xml(_r, "h4");};
+    _r.table = Widget() {return xml(_r, "table");};
+    _r.tr = Widget() {return xml(_r, "tr");};
+    _r.td = Widget() {return xml(_r, "td");};
+    _r.button = Widget() {return xml(_r, "button");};
+    _r.input = Widget() {return xml(_r, "input");};
+    _r.svg = Widget() {return xml(_r, "svg");};
+    _r.rect = Widget() {return xml(_r, "rect");};
+    _r.circle = Widget() {return xml(_r, "circle");};
+    _r.path = Widget() {return xml(_r, "path");};
     _r.class = class(_r);
     _r.style = style(_r);
     _r.attr = attr(_r);
@@ -88,9 +121,9 @@ private Widget(str, void(Widget)) event(Widget p) {
          };
     }
     
-private Widget(str, Msg, void(Widget, Msg)) eventm(Widget p) {
-    return Widget(str eventName, Msg m, void(Widget, Msg) val) {
-         void() q = () {val(p, m);};
+private Widget(str, Msg, void(Msg)) eventm(Widget p) {
+    return Widget(str eventName, Msg m, void(Msg) val) {
+         void() q = () {val(m);};
          if (!(events[p.process]?)) events[p.process] = [];
          events[p.process]+=<{<p.id, eventName>} , q>;
          Widget r = newWidget(p, p.id);
@@ -98,15 +131,22 @@ private Widget(str, Msg, void(Widget, Msg)) eventm(Widget p) {
          };
     }
     
-private Widget(str, Msg(str), void(Widget, Msg)) eventf(Widget p) {
-    return Widget(str eventName, Msg(str) m, void(Widget, Msg) val) {
-         void() q = () {str s = property(p, "value");val(p, m(s));};
+private Widget(str, Msg(str), void(Msg)) eventf(Widget p) {
+    return Widget(str eventName, Msg(str) m, void(Msg) val) {
+         void() q = () {str s = property(p, "value");val(m(s));};
          if (!(events[p.process]?)) events[p.process] = [];
          events[p.process]+=<{<p.id, eventName>} , q>;
          Widget r = newWidget(p, p.id);
          return r;
          };
     }
+/*   
+private Widget() divf(Widget p) {
+   return Widget() {
+        return div(p); 
+        };
+    }
+*/
    
 private Widget(str) class(Widget p) {
    return Widget(str c) {
@@ -162,13 +202,15 @@ private Widget(str) innerHTML(Widget p) =
         return innerHTML(p, s); 
         };
 
-str sep = ";:";
+
 
 public Widget defaultWidget = widget();
 
 Widget createRootWidget(int p, str result) {
-   return widget(process=p, id = result);
+   return newWidget(widget(process=p, id=""), result);
 }
+
+Widget widgetVoid() {return defaultWidget;}
 
 Widget widgetStr(str x) {return defaultWidget;}
 
@@ -180,25 +222,31 @@ Widget widgetStrFun(str x, void(value) y) {return defaultWidget;}
 
 Widget widgetStrValVal(str x, value y, value z) {return defaultWidget;}
 
-Widget widgetEvent1(str x, Msg y, void(value, Msg) z) {return defaultWidget;}
+Widget widgetEvent1(str x, Msg y, void(Msg) z) {return defaultWidget;}
 
-Widget widgetEvent2(str x, Msg(str) y, void(value, Msg) z) {return defaultWidget;}
+Widget widgetEvent2(str x, Msg(str) y, void(Msg) z) {return defaultWidget;}
 
-public Widget createPanel(str initPage="MainPanel", int portNumber= 8000) {
-    int p = openSocketConnection("display.MainPanel", initPage = initPage, portNumber = portNumber); 
+public Widget createPanel(str initPage="MainPanel", int portNumber= 8001
+                         ,int width = 800, int height = 800) {
+    int p = openSocketConnection("display.MainPanel", initPage = initPage, portNumber = portNumber
+    ,width = width, height = height); 
     str result = exchange(p, "root", [],sep);
     Widget r =  createRootWidget(p, result);
+    width0 = width; height0 = height;
     return r;
     }
     
 public Widget createSvgPanel() {
     Widget w = createPanel();
-    Widget s =   svg(w).width(800).height(800);
+    Widget s =   svg(w).width(width0).height(height0);
     return w;
     }
     
 public Widget select(Widget p, str id) {
     }
+str sep = ";:";
+    
+private Widget xml(Widget p, str tg) = newWidget(p, exchange(p.process, tg, [p.id], sep));
     
 public Widget h1(Widget p) = newWidget(p, exchange(p.process, "h1", [p.id], sep));
 
@@ -308,10 +356,11 @@ public str property(Widget p, str attr) {
     return exchange(p.process, "property", [p.id, attr], sep);
     }
     
- public int bounds(Widget p, str attr) {
+ public str bounds(Widget p, str attr) {
    // println("attribute:<p.id> <attr>");
     str r = exchange(p.process, "bounds", [p.id, attr], sep);
-    return round(toReal(r));
+    // return round(toReal(r));
+    return r;
     }
     
 public Widget innerHTML(Widget p, str text) {
@@ -344,7 +393,7 @@ public map[str, str] style(Widget p) {
 @reflect{For getting IO streams}
 @javaClass{display.SocketConnection}
 public java int openSocketConnection(str javaClass, loc workingDir=|cwd:///|, list[str] args = [], map[str,str] envVars = ()
-, int portNumber=8000, str initPage="mainPage");
+, int portNumber=8000, str initPage="mainPage", int width = 800, int height = 800);
 
 @reflect{For getting IO streams}
 @javaClass{display.SocketConnection}

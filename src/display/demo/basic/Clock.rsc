@@ -15,7 +15,10 @@ void clock(Widget dv) {
    int time = 1;
    tuple[int X, int Y] hand = time2coord(time);
    bool running = false;
-   Widget p = svg(dv).width(300).height(300).attr("viewBox", "0 -0 100 100");
+   println(dv.id);
+   Widget p = svg(dv).width(300).height(300);  //.attr("viewBox", "0 -0 100 100");
+   // Widget p = svg(dv);
+   println(p.id);
    Widget c = circle(p).cx(50).cy(50).r(45).attr("fill", "#0B79CE")
                        .attr("stroke", "grey").attr("stroke-width", "4");
    Widget l= line(p).attr("x1", "50").attr("y1", "50").attr("x2", "<hand.X>").attr("y2", "<hand.Y>")

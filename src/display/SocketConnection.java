@@ -57,7 +57,7 @@ public class SocketConnection {
     }
 
     public synchronized IInteger openSocketConnection(IString javaClass, ISourceLocation workingDir, IList arguments,
-        IMap envVars, IInteger portNumber, IString initPage, IEvaluatorContext eval) {
+        IMap envVars, IInteger portNumber, IString initPage, IInteger width, IInteger height, IEvaluatorContext eval) {
         PrintWriter out = eval.getStdOut();
         // String path = this.getClass().getResource(javaClass.getValue()).getPath();
         String path = eval.getConfiguration().getRascalJavaClassPathProperty();
@@ -71,6 +71,8 @@ public class SocketConnection {
             args.add(javaClass.getValue());
             args.add("" + portNumber.intValue());
             args.add(initPage.getValue());
+            args.add(""+width.intValue());
+            args.add(""+height.intValue());
             if (arguments != null) {
                 for (int n = 0; n < arguments.length(); ++n) {
                     if (arguments.get(n) instanceof IString)

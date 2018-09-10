@@ -38,10 +38,10 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 public class MainPanel extends Application{
-    static int width;
-    static int height;
+    static int width = 800;
+    static int height = 800;
     static int portNumber;
-    static String initPage;
+    static String initPage = "";
     
     @Override
     public void start(Stage primaryStage) {
@@ -67,6 +67,7 @@ public class MainPanel extends Application{
                 label.setText("" + portNumber);
             }
         });
+        if (!initPage.isEmpty())
         webEngine.load(this.getClass().getResource(initPage+".html").toString());
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -211,12 +212,13 @@ public class MainPanel extends Application{
             portNumber = Integer.parseInt(args[0]);
         else
             portNumber = 6005;
+        if (args.length>1)
         initPage = args[1];
-        // width = Integer.parseInt(args[1]);
-        // height = Integer.parseInt(args[2]);
-        width = 800;
-        height = 1000;
-        System.err.println("Start:" + portNumber);
+        if (args.length>2) {
+           width = Integer.parseInt(args[2]);
+           height = Integer.parseInt(args[3]);
+        }
+        System.err.println("Start:" + portNumber+" "+width+" "+height);
         launch();
     }
 
