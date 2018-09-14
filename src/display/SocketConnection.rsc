@@ -1,6 +1,7 @@
 module display::SocketConnection
 import Prelude;
 import util::Math;
+import lang::json::IO;
 
 
 // Events
@@ -12,6 +13,12 @@ data Msg = init();
 
 int width0 = 800;
 int height0 = 800;
+
+alias Bounds = tuple[num x, num y, num width, num height];
+alias BoundsC = tuple[num cx, num cy, num width, num height];
+
+BoundsC center(Bounds b) = <b.x+b.width/2, b.y+b.height/2,b.width, b.height>;
+Bounds  bounds(BoundsC c) = <c.cx-c.width/2, c.cy-c.height/2, c.width, c.height>;
 
 map[int, lrel[set[tuple[str id , str eventName]], void()]] events = ();
 
@@ -48,13 +55,13 @@ alias Widget = tuple[int process, str id, str eventName, str val
      ,Widget(str) class = widgetStr
      ,Widget(str) style = widgetStr
      ,Widget(str, str) attr = widgetStrStr
-     ,Widget(int) width  = widgetInt
-     ,Widget(int) height  = widgetInt
-     ,Widget(int) x = widgetInt
-     ,Widget(int) y = widgetInt
-     ,Widget(int) cx = widgetInt
-     ,Widget(int) cy = widgetInt
-     ,Widget(int) r = widgetInt
+     ,Widget(num) width  = widgetNum
+     ,Widget(num) height  = widgetNum
+     ,Widget(num) x = widgetNum
+     ,Widget(num) y = widgetNum
+     ,Widget(num) cx = widgetNum
+     ,Widget(num) cy = widgetNum
+     ,Widget(num) r = widgetNum
      ,Widget(str) innerHTML = widgetStr
      ,Widget(str ,  void(value)) event  = widgetStrFun
      ,Widget(str , Msg , void(Msg)) eventm = widgetEvent1
@@ -155,44 +162,44 @@ private Widget(str) class(Widget p) {
     }
 
     
-private Widget(int) width(Widget p) {
-   return Widget(int w) {
+private Widget(num) width(Widget p) {
+   return Widget(num w) {
         return attribute(p, "width","<w>"); 
         };
     }
     
-private Widget(int) height(Widget p) {
-   return Widget(int h) {
+private Widget(num) height(Widget p) {
+   return Widget(num h) {
         return attribute(p, "height","<h>"); 
         };
     }
     
-private Widget(int) x(Widget p) {
-   return Widget(int d) {
+private Widget(num) x(Widget p) {
+   return Widget(num d) {
         return attribute(p, "x","<d>"); 
         };
     }
     
-private Widget(int) y(Widget p) {
-   return Widget(int d) {
+private Widget(num) y(Widget p) {
+   return Widget(num d) {
         return attribute(p, "y","<d>"); 
         };
     }
     
-private Widget(int) cx(Widget p) {
-   return Widget(int d) {
+private Widget(num) cx(Widget p) {
+   return Widget(num d) {
         return attribute(p, "cx","<d>"); 
         };
     }
     
-private Widget(int) cy(Widget p) {
-   return Widget(int d) {
+private Widget(num) cy(Widget p) {
+   return Widget(num d) {
         return attribute(p, "cy","<d>"); 
         };
     }
     
-private Widget(int) r(Widget p) {
-   return Widget(int d) {
+private Widget(num) r(Widget p) {
+   return Widget(num d) {
         return attribute(p, "r","<d>"); 
         };
     }
@@ -216,6 +223,8 @@ Widget widgetStr(str x) {return defaultWidget;}
 
 Widget widgetInt(int x) {return defaultWidget;}
 
+Widget widgetNum(num x) {return defaultWidget;}
+
 Widget widgetStrStr(str x, str y) {return defaultWidget;}
 
 Widget widgetStrFun(str x, void(value) y) {return defaultWidget;}
@@ -230,6 +239,7 @@ public Widget createPanel(str initPage="MainPanel", int portNumber= 8001
                          ,int width = 800, int height = 800) {
     int p = openSocketConnection("display.MainPanel", initPage = initPage, portNumber = portNumber
     ,width = width, height = height); 
+    setPrecision(3);
     str result = exchange(p, "root", [],sep);
     Widget r =  createRootWidget(p, result);
     width0 = width; height0 = height;
@@ -356,11 +366,20 @@ public str property(Widget p, str attr) {
     return exchange(p.process, "property", [p.id, attr], sep);
     }
     
- public str bounds(Widget p, str attr) {
+ public Bounds getBBox(Widget p) {
    // println("attribute:<p.id> <attr>");
-    str r = exchange(p.process, "bounds", [p.id, attr], sep);
+    str r = exchange(p.process, "getBBox", [p.id], sep);
     // return round(toReal(r));
-    return r;
+    map[str, num] z = parseJSON(#map[str, num], r);
+    return <z["x"], z["y"], z["width"], z["height"]>;
+    }
+    
+ public Bounds getBoundingClientRec(Widget p) {
+   // println("attribute:<p.id> <attr>");
+    str r = exchange(p.process, "getBoundingClientRec", [p.id], sep);
+    // return round(toReal(r));
+    map[str, num] z = parseJSON(#map[str, num], r);
+    return <z["left"], z["top"], z["width"], z["height"]>;
     }
     
 public Widget innerHTML(Widget p, str text) {

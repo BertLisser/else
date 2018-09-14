@@ -219,9 +219,9 @@ class DomUpdate {
         return val;
     }
     
-    public String bounds(String attr) {
-        final String result = "var found = document.getElementById(\"" + this.id + "\");\n" 
-                            +"var result = found.getBoundingClientRect()."+attr+";\n"
+    public String getBBox() {
+        final String result = 
+                            "var result = getBBox(\""+this.id+"\");\n"
                             + "\"\"+result";
         String val = (String) webEngine.executeScript(result);
         return val;

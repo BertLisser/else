@@ -145,9 +145,15 @@ public class MainPanel extends Application{
                                    }
                                     break;           
                                 } 
-                                case "bounds" : {
+                                case "getBBox" : {
                                     eMsg(""+input.length);
-                                    String s = root.select(input[1]).bounds(input[2]);
+                                    String s = root.select(input[1]).getBBox();
+                                    eMsg(s);
+                                    out.println(s);
+                                }
+                                case "getBoundingClientRec" : {
+                                    eMsg(""+input.length);
+                                    String s = root.select(input[1]).getBoundingCientRect();
                                     eMsg(s);
                                     out.println(s);
                                 }
